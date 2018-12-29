@@ -4,6 +4,7 @@ version = "0.1.1"
 authors = ["joydeep bhattacharjee <joydeepubuntu@gmail.com>"]
 edition = "2018"
 description = "opens files for reading."
+repository = "https://github.com/infinite-Joy/smart-open"
 readme = "README.md"
 license = "MIT"
 

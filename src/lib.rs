@@ -1,3 +1,4 @@
+#![crate_name = "smart_open"]
 extern crate flate2;
 
 use std::fs::File;
@@ -6,6 +7,14 @@ use std::path::Path;
 use std::string::String;
 use flate2::read::GzDecoder;
 
+/// Returns the contents of the file that has been passed as filepath
+///
+/// # Examples
+///
+/// ```
+/// let filepath = "tests/foo.txt";
+/// assert_eq!(smart_open::smart_open(&filepath).unwrap(), "Hello, world!");
+/// ```
 pub fn smart_open(filepath: &str) -> std::io::Result<String> {
     // TODO: make the function more modular.
     let path = Path::new(filepath);

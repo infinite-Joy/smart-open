@@ -3,6 +3,9 @@ name = "smart_open"
 version = "0.1.0"
 authors = ["joydeep bhattacharjee <joydeepubuntu@gmail.com>"]
 edition = "2018"
+description = "opens files for reading."
+readme = "README.md"
+license = "LICENSE"
 
 [dependencies]
 flate2 = "1.0"

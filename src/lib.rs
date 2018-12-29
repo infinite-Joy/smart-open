@@ -15,10 +15,6 @@ use std::num;
 pub fn smart_open(filepath: &str) -> std::io::Result<String> {
     // TODO: make the function more modular.
     let path = Path::new(filepath);
-    let extension = path.extension();
-    let text_ext = OsStr::new("gz");
-    let gz_ext = OsStr::new("txt");
-    // println!("{:#?}", extension);
     let content_type = match path.extension() {
         None => panic!("Paths without extension is not allowed!!"),
         Some(os_str) => {

@@ -22,10 +22,9 @@ pub fn smart_open(filepath: &str) -> std::io::Result<String> {
         None => panic!("Paths without extension is not allowed!!"),
         Some(os_str) => {
             match os_str.to_str() {
-                Some("txt") => "text",
-                Some("gz") => "gz",
-                Some(e) => panic!("{} case is not implemented yet. Please contact the developers!", e),
                 None => panic!("None has seeped in somehow. Please contact developers."),
+                Some("gz") => "gz",
+                _ => "text",
             }
         }
     };

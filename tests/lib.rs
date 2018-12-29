@@ -17,10 +17,4 @@ mod tests {
     fn test_gzip_file() {
         assert_eq!(sm::smart_open("tests/bar.txt.gz").unwrap(), "Hello, world!");
     }
-
-    #[test]
-    #[should_panic(expected = r#"png case is not implemented yet"#)]
-    fn test_unknown_file() {
-        let _ = sm::smart_open("tests/abc.png");
-    }
 }

@@ -1,16 +1,12 @@
 extern crate flate2;
 
-use std::io::prelude::*;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
-use std::ffi::OsStr;
 use std::string::String;
-use std::error::Error;
 use flate2::read::GzDecoder;
 
-use std::io::{self, Read};
-use std::num;
+use std::io::Read;
 
 pub fn smart_open(filepath: &str) -> std::io::Result<String> {
     // TODO: make the function more modular.

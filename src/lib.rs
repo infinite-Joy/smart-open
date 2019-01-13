@@ -60,18 +60,13 @@ fn open_s3(filepath: &str) -> Result<String> {
                         break data;
                     }
                 } else {
-                    println!("failed with {}", r);
+                    debug!("failed with {}", r);
                 }
              },
             _ => panic!("All the regions have been exhausted."),
         }
     };
-    // Create Bucket in REGION for BUCKET
-    let credentials = Credentials::default();
-    let bucket = Bucket::new(&s3_filepath.bucket, region, credentials);
-    let (data, code) = bucket.get(&s3_filepath.key).unwrap();
-    let string = str::from_utf8(&data).unwrap();
-    assert_eq!(200, code);
+    let string = str::from_utf8(&result).unwrap();
     Ok(string.to_string())
 }
 

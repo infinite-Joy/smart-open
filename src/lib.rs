@@ -1,5 +1,7 @@
 #![crate_name = "smart_open"]
 extern crate flate2;
+#[macro_use]
+extern crate log;
 
 use std::fs::File;
 use std::str;
@@ -26,14 +28,44 @@ fn parse_s3_filepaths(filepath: &str) -> S3Filepath {
 
 fn open_s3(filepath: &str) -> Result<String> {
     let s3_filepath: S3Filepath = parse_s3_filepaths(&filepath);
-    let output = Command::new("aws")
-        .arg("s3api")
-        .arg("get-bucket-location")
-        .arg("--bucket")
-        .arg(&s3_filepath.bucket)
-        .output()
-        .expect("failed to execute process");
-    let region: Region = String::from_utf8_lossy(&output.stdout).trim().to_owned().parse().unwrap();
+    // let output = Command::new("aws")
+    //     .arg("s3api")
+    //     .arg("get-bucket-location")
+    //     .arg("--bucket")
+    //     .arg(&s3_filepath.bucket)
+    //     .output()
+    //     .expect("failed to execute process");
+    // let region: Region = String::from_utf8_lossy(&output.stdout).trim().to_owned().parse().unwrap();
+    let mut regions = vec![
+        Region::DoAms3, Region::DoNyc3, Region::UsEast1,
+        Region::UsEast2, Region::UsWest1,
+        Region::UsWest2, Region::CaCentral1,
+        Region::ApSouth1, Region::ApNortheast1,
+        Region::ApNortheast2, Region::ApNortheast3,
+        Region::ApSoutheast1, Region::ApSoutheast2,
+        Region::CnNorth1, Region::CnNorthwest1,
+        Region::EuCentral1, Region::EuWest1,
+        Region::EuWest2, Region::EuWest3,
+        Region::SaEast1, Region::DoNyc3,
+        Region::DoAms3, Region::DoSgp1,
+    ];
+    let result = loop {
+        match regions.pop() {
+            Some(r) => { 
+                // Create Bucket in REGION for BUCKET
+                let credentials = Credentials::default();
+                let bucket = Bucket::new(&s3_filepath.bucket, r.clone(), credentials);
+                if let Ok((data, code)) = bucket.get(&s3_filepath.key) {
+                    if code == 200 {
+                        break data;
+                    }
+                } else {
+                    println!("failed with {}", r);
+                }
+             },
+            _ => panic!("All the regions have been exhausted."),
+        }
+    };
     // Create Bucket in REGION for BUCKET
     let credentials = Credentials::default();
     let bucket = Bucket::new(&s3_filepath.bucket, region, credentials);

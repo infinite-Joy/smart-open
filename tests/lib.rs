@@ -17,4 +17,16 @@ mod tests {
     fn test_gzip_file() {
         assert_eq!(sm::smart_open("tests/bar.txt.gz").unwrap(), "Hello, world!");
     }
+
+    #[test]
+    fn test_s3_simple_file() {
+        assert_eq!(sm::smart_open("s3://bml-data/churn-bigml-80.csv").unwrap().is_empty(),
+        false, "not able to parse the remote file");
+    }
+
+    #[test]
+    #[should_panic(expected = r#"All the regions have been exhausted."#)]
+    fn test_s3_nonexistingfile() {
+        let _ = sm::smart_open("s3://bml-data/dummyfile.csv").unwrap();
+    }
 }

@@ -19,8 +19,8 @@ You can find sample code for other types of files in the `examples` directory.
 
 - [x] Open text file on local filesystem.
 - [x] Open gz text file on local filesystem.
-- [ ] Support for other text file formats (csv, json) etc.
-- [ ] Text files on s3.
+- [x] Support for other text file formats (csv, json) etc.
+- [x] Text files on s3.
 - [ ] Gz files on s3.
 - [ ] Files on http.
 

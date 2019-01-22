@@ -2,7 +2,9 @@
 extern crate flate2;
 #[macro_use]
 extern crate log;
+extern crate reqwest;
 
+use std::result::Result as StdRes;
 use std::fs::File;
 use std::str;
 use std::io::{BufReader, Read, Result};
@@ -12,6 +14,7 @@ use flate2::read::GzDecoder;
 use s3::bucket::Bucket;
 use s3::credentials::Credentials;
 use s3::region::Region;
+use reqwest::Error as req_error;
 
 
 #[derive(Debug)]
@@ -65,10 +68,23 @@ fn open_s3(filepath: &str) -> Result<String> {
     Ok(string.to_string())
 }
 
+fn open_http(filepath: &str) -> StdRes<String, req_error> {
+    let mut resp = reqwest::get(filepath).expect("could not get the file.");
+    let mut buf: Vec<u8> = vec![];
+    resp.copy_to(&mut buf)?;
+    let string = match str::from_utf8(&mut buf) {
+        Ok(v) => v,
+        Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+    };
+    Ok(string.to_string())
+}
+
 fn pass_to_appropriate_function_for_content(filepath: &str, path: &Path, content_type: &str) -> Result<String> {
     let mut contents = String::new();
     if filepath.starts_with("s3://") {
         contents = open_s3(&filepath).unwrap();
+    } else if filepath.starts_with("http") {
+        contents = open_http(&filepath).unwrap();
     } else {
         let file_handler = File::open(&path)?;
         let mut buf_reader = BufReader::new(file_handler);

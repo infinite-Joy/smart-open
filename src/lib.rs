@@ -69,7 +69,10 @@ fn open_s3(filepath: &str) -> Result<String> {
 }
 
 fn open_http(filepath: &str) -> StdRes<String, req_error> {
-    let mut resp = reqwest::get(filepath).expect("could not get the file.");
+    // let mut resp = reqwest::get(filepath).expect("could not get the file.");
+    let mut resp = reqwest::get(filepath)?;
+    println!("{:#?}", resp);
+    println!("{:#?}", resp.status());
     let mut buf: Vec<u8> = vec![];
     resp.copy_to(&mut buf)?;
     let string = match str::from_utf8(&mut buf) {
@@ -113,7 +116,8 @@ pub fn smart_open(filepath: &str) -> std::io::Result<String> {
     // TODO: make the function more modular.
     let path = Path::new(&filepath);
     let content_type = match path.extension() {
-        None => panic!("Paths without extension is not allowed!!"),
+        // OK so I have decided to include file extensions without paths.
+        None => "text",
         Some(os_str) => {
             match os_str.to_str() {
                 None => panic!("None has seeped in somehow. Please contact developers."),

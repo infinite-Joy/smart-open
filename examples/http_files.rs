@@ -14,17 +14,19 @@ use std::str;
 // }
 
 fn make_request() -> Result<String, reqwest::Error> {
-    let mut resp = match reqwest::get("http://httpbin.org/range/something") {
-        Err(e) => handler(e),
-        Ok(r) => r,
-    };
+    let mut resp = reqwest::get("http://httpbin.org/range/something").expect("not able to make the request");
     // match make_request() {
     //    Err(e) => handler(e),
     // //    Ok(s)  => println!("result: {}", s),
     //    Ok(_)  => println!("this is good."),
     // };
+    let mut resp1 = if resp.status().is_success() {
+       resp
+    } else {
+        panic!("Something") // Great now this is working.
+    };
     let mut buf: Vec<u8> = vec![];
-    resp.copy_to(&mut buf)?;
+    resp1.copy_to(&mut buf)?;
     let s = match str::from_utf8(&mut buf) {
         Ok(v) => v,
         Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
@@ -55,6 +57,7 @@ fn handler(e: reqwest::Error) {
    if e.is_client_error() {
        panic!("Server error {:#?}", e);
    }
+
 }
 
 fn main() -> Result<(), reqwest::Error> {
@@ -73,12 +76,13 @@ fn main() -> Result<(), reqwest::Error> {
     // // assert_eq!(b"abcde", buf.as_slice());
     
     // let res_str = match make_request() {
-    match make_request() {
-       Err(e) => handler(e),
-    //    Ok(s)  => println!("result: {}", s),
-       Ok(_)  => println!("this is good."),
-    };
+    // match make_request() {
+    //    Err(e) => handler(e),
+    // //    Ok(s)  => println!("result: {}", s),
+    //    Ok(_)  => println!("this is good."),
+    // };
     // assert_eq!(b"abcde", res_str.as_slice());
+    make_request();
 
     Ok(())
 }

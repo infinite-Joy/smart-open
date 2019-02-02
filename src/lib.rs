@@ -118,7 +118,8 @@ pub fn smart_open(filepath: &str) -> std::io::Result<String> {
     // TODO: make the function more modular.
     let path = Path::new(&filepath);
     let content_type = match path.extension() {
-        None => panic!("Paths without extension is not allowed!!"),
+        // OK so I have decided to include file extensions without paths.
+        None => "text",
         Some(os_str) => {
             match os_str.to_str() {
                 None => panic!("None has seeped in somehow. Please contact developers."),

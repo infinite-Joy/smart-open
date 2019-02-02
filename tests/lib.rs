@@ -29,4 +29,14 @@ mod tests {
     fn test_s3_nonexistingfile() {
         let _ = sm::smart_open("s3://bml-data/dummyfile.csv").unwrap();
     }
+
+    // #[test]
+    // fn test_http_file_valid() {
+    //     assert_eq!(sm::smart_open(""))
+    // }
+
+    #[test]
+    fn test_http_file_invalid() {
+        let _ = sm::smart_open("http://httpbin.org/range/something").unwrap();
+    }
 }

@@ -49,7 +49,7 @@ fn open_s3(filepath: &str) -> Result<String> {
     ];
     let result = loop {
         match regions.pop() {
-            Some(r) => { 
+            Some(r) => {
                 // Create Bucket in REGION for BUCKET
                 let credentials = Credentials::default();
                 let bucket = Bucket::new(&s3_filepath.bucket, r.clone(), credentials);
@@ -69,9 +69,14 @@ fn open_s3(filepath: &str) -> Result<String> {
 }
 
 fn open_http(filepath: &str) -> StdRes<String, req_error> {
-    let mut resp = reqwest::get(filepath).expect("could not get the file.");
+    let resp = reqwest::get(filepath)?;
+    let mut verified_response = if resp.status().is_success() {
+        resp
+    } else {
+        panic!("The file {} not parsed correctly. Please check", filepath);
+    };
     let mut buf: Vec<u8> = vec![];
-    resp.copy_to(&mut buf)?;
+    verified_response.copy_to(&mut buf)?;
     let string = match str::from_utf8(&mut buf) {
         Ok(v) => v,
         Err(e) => panic!("Invalid UTF-8 sequence: {}", e),

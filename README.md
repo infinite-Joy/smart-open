@@ -22,7 +22,7 @@ You can find sample code for other types of files in the `examples` directory.
 - [x] Support for other text file formats (csv, json) etc.
 - [x] Text files on s3.
 - [ ] Gz files on s3.
-- [ ] Files on http.
+- [x] Files on http.
 
 
 ## Comments, bug reports

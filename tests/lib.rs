@@ -20,8 +20,13 @@ mod tests {
 
     #[test]
     fn test_s3_simple_file() {
-        assert_eq!(sm::smart_open("s3://bml-data/churn-bigml-80.csv").unwrap().is_empty(),
-        false, "not able to parse the remote file");
+        assert_eq!(
+            sm::smart_open("s3://bml-data/churn-bigml-80.csv")
+                .unwrap()
+                .is_empty(),
+            false,
+            "not able to parse the remote file"
+        );
     }
 
     #[test]
@@ -30,17 +35,17 @@ mod tests {
         let _ = sm::smart_open("s3://bml-data/dummyfile.csv").unwrap();
     }
 
-
     #[test]
     fn test_open_http() {
-        assert_eq!(sm::smart_open("http://httpbin.org/range/26").unwrap(),
-        "abcdefghijklmnopqrstuvwxyz");
+        assert_eq!(
+            sm::smart_open("http://httpbin.org/range/26").unwrap(),
+            "abcdefghijklmnopqrstuvwxyz"
+        );
     }
 
     #[test]
-    // #[should_panic(expected = r#"All the regions have been exhausted."#)]
+    #[should_panic(expected = r#"not parsed correctly"#)]
     fn test_http_non_existing_file() {
-        assert_eq!(sm::smart_open("http://httpbin.org/range/something").unwrap(),
-            "abcdefghijklmnopqrstuvwxyz");
+        let _ = sm::smart_open("http://httpbin.org/range/something").unwrap();
     }
 }

@@ -92,6 +92,14 @@ fn parse_gzip_buffer_to_string(buf: &mut Vec<u8>) -> Result<String> {
     Ok(s)
 }
 
+fn parse_normal_buffer_to_string(buf: &mut Vec<u8>) -> Result<String> {
+    let s = match str::from_utf8(buf) {
+        Ok(v) => v,
+        Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+    };
+    Ok(s.to_string())
+}
+
 fn open_http(filepath: &str, content_type: &str) -> StdRes<String, req_error> {
     let resp = reqwest::get(filepath)?;
     let mut verified_response = if resp.status().is_success() {
@@ -103,16 +111,10 @@ fn open_http(filepath: &str, content_type: &str) -> StdRes<String, req_error> {
     verified_response.copy_to(&mut buf)?;
     let string = match content_type.as_ref() {
         "gz" => parse_gzip_buffer_to_string(&mut buf).unwrap(),
-        // "text" => {
-        //     let s = match str::from_utf8(&mut buf) {
-        //         Ok(v) => v,
-        //         Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
-        //     };
-        //     s
-        // }
+        "text" => parse_normal_buffer_to_string(&mut buf).unwrap(),
         e => panic!("Case not handled: {}", e),
     };
-    Ok(string.to_string())
+    Ok(string)
 }
 
 fn pass_to_appropriate_function_for_content(

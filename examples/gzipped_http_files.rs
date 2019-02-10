@@ -1,5 +1,4 @@
 extern crate flate2;
-extern crate hyper;
 extern crate reqwest;
 
 use std::io::Read;

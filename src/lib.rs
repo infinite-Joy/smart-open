@@ -4,17 +4,22 @@ extern crate flate2;
 extern crate log;
 extern crate reqwest;
 
-use flate2::read::GzDecoder;
-use reqwest::Error as req_error;
-use s3::bucket::Bucket;
-use s3::credentials::Credentials;
-use s3::region::Region;
 use std::fs::File;
+use std::io;
+use std::io::prelude::*;
 use std::io::{BufReader, Read, Result};
 use std::path::Path;
 use std::result::Result as StdRes;
 use std::str;
 use std::string::String;
+
+use flate2::read::GzDecoder;
+use flate2::write::GzEncoder;
+use flate2::Compression;
+use reqwest::Error as req_error;
+use s3::bucket::Bucket;
+use s3::credentials::Credentials;
+use s3::region::Region;
 
 #[derive(Debug)]
 struct S3Filepath {
@@ -140,6 +145,15 @@ fn pass_to_appropriate_function_for_content(
         }
     }
     Ok(contents.trim().to_string())
+}
+
+#[test]
+fn test_parse_gzip_buffer_to_string() {
+    let mut e = GzEncoder::new(Vec::new(), Compression::default());
+    e.write_all(b"Hello World").unwrap();
+    let mut bytes = e.finish().unwrap();
+    let uncompressed = parse_gzip_buffer_to_string(&mut bytes).unwrap();
+    assert_eq!(uncompressed, "Hello World");
 }
 
 /// Returns the contents of the file that has been passed as filepath

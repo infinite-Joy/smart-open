@@ -156,6 +156,21 @@ fn test_parse_gzip_buffer_to_string() {
     assert_eq!(uncompressed, "Hello World");
 }
 
+#[test]
+fn test_parse_normal_buffer_to_string() {
+    let s = String::from("smart-open");
+    let mut bytes = s.clone().into_bytes();
+    println!("{:?}", bytes);
+    assert_eq!(s, parse_normal_buffer_to_string(&mut bytes).unwrap());
+}
+
+#[test]
+#[should_panic(expected = r#"Invalid UTF-8 sequence"#)]
+fn test_parse_normal_buffer_to_string_invalid() {
+    let mut sparkle_heart = vec![0, 159, 146, 150];
+    let _ = parse_normal_buffer_to_string(&mut sparkle_heart).unwrap();
+}
+
 /// Returns the contents of the file that has been passed as filepath
 ///
 /// # Examples

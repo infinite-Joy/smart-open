@@ -97,12 +97,45 @@ fn parse_gzip_buffer_to_string(buf: &mut Vec<u8>) -> Result<String> {
     Ok(s)
 }
 
+#[test]
+fn test_parse_gzip_buffer_to_string() {
+    let mut e = GzEncoder::new(Vec::new(), Compression::default());
+    e.write_all(b"smart open").unwrap();
+    let mut bytes = e.finish().unwrap();
+    println!("{:?}", bytes);
+    // bytes ~= [31, 139, 8, 0, 0, 0, 0, 0, 0, 255, 1, 10, 0, 245, 255, 115,
+    // 109, 97, 114, 116, 32, 111, 112, 101, 110, 82, 109, 40, 224, 10, 0, 0, 0]
+    let uncompressed = parse_gzip_buffer_to_string(&mut bytes).unwrap();
+    assert_eq!(uncompressed, "smart open");
+}
+
+#[test]
+#[should_panic(expected = r#"Not able to gunzip the read resource. Please check."#)]
+fn test_parse_invalid_gzip() {
+    let mut bytes = vec![31, 139];
+    let _ = parse_gzip_buffer_to_string(&mut bytes).unwrap();
+}
+
 fn parse_normal_buffer_to_string(buf: &mut Vec<u8>) -> Result<String> {
     let s = match str::from_utf8(buf) {
         Ok(v) => v,
         Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
     };
     Ok(s.to_string())
+}
+
+#[test]
+fn test_parse_normal_buffer_to_string() {
+    let s = String::from("smart-open");
+    let mut bytes = s.clone().into_bytes();
+    assert_eq!(s, parse_normal_buffer_to_string(&mut bytes).unwrap());
+}
+
+#[test]
+#[should_panic(expected = r#"Invalid UTF-8 sequence"#)]
+fn test_parse_normal_buffer_to_string_invalid() {
+    let mut sparkle_heart = vec![0, 159, 146, 150];
+    let _ = parse_normal_buffer_to_string(&mut sparkle_heart).unwrap();
 }
 
 fn open_http(filepath: &str, content_type: &str) -> StdRes<String, req_error> {
@@ -145,30 +178,6 @@ fn pass_to_appropriate_function_for_content(
         }
     }
     Ok(contents.trim().to_string())
-}
-
-#[test]
-fn test_parse_gzip_buffer_to_string() {
-    let mut e = GzEncoder::new(Vec::new(), Compression::default());
-    e.write_all(b"Hello World").unwrap();
-    let mut bytes = e.finish().unwrap();
-    let uncompressed = parse_gzip_buffer_to_string(&mut bytes).unwrap();
-    assert_eq!(uncompressed, "Hello World");
-}
-
-#[test]
-fn test_parse_normal_buffer_to_string() {
-    let s = String::from("smart-open");
-    let mut bytes = s.clone().into_bytes();
-    println!("{:?}", bytes);
-    assert_eq!(s, parse_normal_buffer_to_string(&mut bytes).unwrap());
-}
-
-#[test]
-#[should_panic(expected = r#"Invalid UTF-8 sequence"#)]
-fn test_parse_normal_buffer_to_string_invalid() {
-    let mut sparkle_heart = vec![0, 159, 146, 150];
-    let _ = parse_normal_buffer_to_string(&mut sparkle_heart).unwrap();
 }
 
 /// Returns the contents of the file that has been passed as filepath

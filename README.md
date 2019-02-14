@@ -6,7 +6,7 @@ Opens files for reading.
 `smart_open` is a rust crate under active development with the goal of opening any text file (compressed or uncompressed) present either in local or on the cloud or the web.
 
     extern crate smart_open as sm;
-    
+
     pub fn main() {
         let text = sm::smart_open("tests/bar.txt.gz").unwrap();
         println!("{}", text);
@@ -20,9 +20,10 @@ You can find sample code for other types of files in the `examples` directory.
 - [x] Open text file on local filesystem.
 - [x] Open gz text file on local filesystem.
 - [x] Support for other text file formats (csv, json) etc.
-- [x] Text files on s3.
-- [ ] Gz files on s3.
-- [x] Files on http.
+- [x] s3 text files.
+- [ ] s3 + gz files.
+- [x] http text files.
+- [x] http + gz files
 
 
 ## Comments, bug reports

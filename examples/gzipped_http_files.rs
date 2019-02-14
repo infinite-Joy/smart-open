@@ -3,10 +3,8 @@ extern crate reqwest;
 
 use std::io::Read;
 use std::result::Result;
-use std::time::Duration;
 
 use flate2::read::GzDecoder;
-use reqwest::Client;
 
 fn main() -> Result<(), reqwest::Error> {
     let resp = reqwest::get("https://wiki.mozilla.org/images/f/ff/Example.json.gz")?;
@@ -23,7 +21,7 @@ fn main() -> Result<(), reqwest::Error> {
     let mut s = String::new();
     match gz.read_to_string(&mut s) {
         Ok(v) => v,
-        Err(e) => panic!("something not working"),
+        Err(_) => panic!("something not working"),
     };
     println!("final output:");
     println!("{}", s);

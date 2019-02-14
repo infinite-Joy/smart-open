@@ -5,7 +5,7 @@ extern crate log;
 extern crate reqwest;
 
 use std::fs::File;
-use std::io;
+#[allow(unused_imports)]
 use std::io::prelude::*;
 use std::io::{BufReader, Read, Result};
 use std::path::Path;
@@ -14,7 +14,9 @@ use std::str;
 use std::string::String;
 
 use flate2::read::GzDecoder;
+#[allow(unused_imports)]
 use flate2::write::GzEncoder;
+#[allow(unused_imports)]
 use flate2::Compression;
 use reqwest::Error as req_error;
 use s3::bucket::Bucket;

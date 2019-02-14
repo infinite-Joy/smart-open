@@ -102,7 +102,6 @@ fn test_parse_gzip_buffer_to_string() {
     let mut e = GzEncoder::new(Vec::new(), Compression::default());
     e.write_all(b"smart open").unwrap();
     let mut bytes = e.finish().unwrap();
-    println!("{:?}", bytes);
     // bytes ~= [31, 139, 8, 0, 0, 0, 0, 0, 0, 255, 1, 10, 0, 245, 255, 115,
     // 109, 97, 114, 116, 32, 111, 112, 101, 110, 82, 109, 40, 224, 10, 0, 0, 0]
     let uncompressed = parse_gzip_buffer_to_string(&mut bytes).unwrap();

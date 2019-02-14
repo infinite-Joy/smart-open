@@ -56,8 +56,8 @@ where
 }
 
 fn main() {
-    let clock = SmartOpenRequest::get("http://httpbin.org/range/26").unwrap();
-    let mut repository = TimestampingRepository::get(&clock);
+    let res = SmartOpenRequest::get("http://httpbin.org/range/26").unwrap();
+    let mut repository = TimestampingRepository::get(&res);
 }
 
 #[cfg(test)]

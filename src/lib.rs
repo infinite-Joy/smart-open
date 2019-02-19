@@ -29,6 +29,47 @@ struct S3Filepath {
     key: String,
 }
 
+trait Request {
+    fn get(&self, url: &str) -> Result<Vec<u8>>;
+}
+
+#[derive(Debug)]
+struct SmartOpenRequest;
+
+impl SmartOpenRequest {
+    fn new() -> Self {
+        SmartOpenRequest {}
+    }
+}
+
+impl Request for SmartOpenRequest {
+    fn get(&self, url: &str) -> Result<Vec<u8>> {
+        let resp = match reqwest::get(url) {
+            Ok(r) => r,
+            Err(e) => panic!(
+                "Some issue with the url {url} with error: {error}.",
+                url = url,
+                error = e
+            ),
+        };
+        let mut verified_response = if resp.status().is_success() {
+            resp
+        } else {
+            panic!(
+                "Url {url} returned a non success status {status}",
+                url = url,
+                status = resp.status()
+            );
+        };
+        let mut buf: Vec<u8> = vec![];
+        let _ = match verified_response.copy_to(&mut buf) {
+            Ok(r) => r,
+            Err(e) => panic!("Not able to parse the response {}", e),
+        };
+        Ok(buf)
+    }
+}
+
 fn parse_s3_filepaths(filepath: &str) -> S3Filepath {
     let split: Vec<&str> = filepath.split("/").collect();
     S3Filepath {

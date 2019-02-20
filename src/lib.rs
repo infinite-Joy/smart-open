@@ -70,6 +70,36 @@ impl Request for SmartOpenRequest {
     }
 }
 
+#[derive(Debug)]
+struct SmartOpenRequestClient<'a, RequestType>
+where
+    RequestType: Request + 'a,
+{
+    request: &'a RequestType,
+    response: Vec<u8>,
+}
+
+impl<'a, RequestType> SmartOpenRequestClient<'a, RequestType>
+where
+    RequestType: Request + 'a,
+{
+    fn with_request(request: &'a RequestType) -> Self {
+        SmartOpenRequestClient {
+            request,
+            response: vec![],
+        }
+    }
+
+    fn get_response(&mut self, url: &str) -> Result<Vec<u8>> {
+        let res = self.request.get(url).unwrap();
+        let res_not_empty = match res.is_empty() {
+            false => res,
+            true => panic!("Nothing in response."),
+        };
+        Ok(res_not_empty)
+    }
+}
+
 fn parse_s3_filepaths(filepath: &str) -> S3Filepath {
     let split: Vec<&str> = filepath.split("/").collect();
     S3Filepath {
@@ -181,14 +211,21 @@ fn test_parse_normal_buffer_to_string_invalid() {
 }
 
 fn open_http(filepath: &str, content_type: &str) -> StdRes<String, req_error> {
-    let resp = reqwest::get(filepath)?;
-    let mut verified_response = if resp.status().is_success() {
-        resp
-    } else {
-        panic!("The file {} not parsed correctly. Please check", filepath);
+    // let resp = reqwest::get(filepath)?;
+    // let mut verified_response = if resp.status().is_success() {
+    //     resp
+    // } else {
+    //     panic!("The file {} not parsed correctly. Please check", filepath);
+    // };
+    // let mut buf: Vec<u8> = vec![];
+    // verified_response.copy_to(&mut buf)?;
+    let req = SmartOpenRequest::new();
+    let mut soc = SmartOpenRequestClient::with_request(&req);
+    let mut buf = match soc.get_response(filepath) {
+        Ok(b) => b,
+        Err(e) => panic!("Get response for http not returned correctly. {}", e),
     };
-    let mut buf: Vec<u8> = vec![];
-    verified_response.copy_to(&mut buf)?;
+
     let string = match content_type.as_ref() {
         "gz" => parse_gzip_buffer_to_string(&mut buf).unwrap(),
         "text" => parse_normal_buffer_to_string(&mut buf).unwrap(),
